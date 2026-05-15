@@ -1,0 +1,16 @@
+services:
+  internet-monitor:
+    build: .
+    container_name: internet-monitor
+    restart: unless-stopped
+    ports:
+      - "8181:8181"
+    env_file:
+      - .env
+    # Optional: ensure it's in the same network as InfluxDB if running locally
+    # networks:
+    #   - monitoring
+
+# networks:
+#   monitoring:
+#     external: true
