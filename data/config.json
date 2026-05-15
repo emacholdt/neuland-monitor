@@ -1,0 +1,11 @@
+{
+    "influxdb_url": "http://192.168.1.117:8086",
+    "influxdb_token": "Opl8ML0SAQEqn_tDhBqAHCTs63iosCbyjbqsbkS_OatlQb11tKtRdEkT22orrCjzgWGo5gulZlmmCLsA1f9GtA==",
+    "influxdb_org": "macholdt",
+    "influxdb_bucket": "neuland_monitor_dev",
+    "ping_target": "8.8.8.8",
+    "ping_interval": 30,
+    "speedtest_interval": 144,
+    "admin_password": "wieAMafWXCDvxl9VHIY^kXu@zVpC8vqjyAt",
+    "port": 8181
+}
