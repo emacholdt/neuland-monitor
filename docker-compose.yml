@@ -1,6 +1,6 @@
 services:
   neuland-monitor:
-    build: .
+    image: emacholdt/neuland-monitor:latest
     container_name: neuland-monitor
     restart: unless-stopped
     ports:
