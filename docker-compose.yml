@@ -13,6 +13,6 @@ services:
     # networks:
     #   - monitoring
 
-# networks:
-#   monitoring:
-#     external: true
+    # networks:
+    #   monitoring:
+    #     external: true

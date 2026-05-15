@@ -143,9 +143,17 @@
             filter: brightness(1.2);
         }
 
-        .bar-online { background-color: var(--accent-green); }
-        .bar-offline { background-color: var(--accent-red); }
-        .bar-empty { background-color: rgba(255, 255, 255, 0.1); }
+        .bar-online {
+            background-color: var(--accent-green);
+        }
+
+        .bar-offline {
+            background-color: var(--accent-red);
+        }
+
+        .bar-empty {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
 
         .timeline-labels {
             display: flex;
@@ -327,13 +335,28 @@
             transition: all 0.3s ease;
         }
 
-        .toast-success { border-left: 4px solid var(--accent-green); }
-        .toast-error { border-left: 4px solid var(--accent-red); }
-        .toast-info { border-left: 4px solid var(--accent-blue); }
+        .toast-success {
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .toast-error {
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .toast-info {
+            border-left: 4px solid var(--accent-blue);
+        }
 
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         .toast.fade-out {
@@ -436,7 +459,9 @@
 <body>
     <div id="toast-container"></div>
     <div class="lang-switch" onclick="toggleLanguage()">
-        <span id="lang-en">EN</span> | <span id="lang-de">DE</span>
+        <span id="lang-en" title="English">EN</span> | 
+        <span id="lang-de" title="Deutsch">DE</span> | 
+        <span id="lang-sx" title="Sächsisch">SX</span>
     </div>
     <div class="background-blob"></div>
 
@@ -455,7 +480,8 @@
                 <div class="stat-item" style="grid-column: span 2;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                         <span class="stat-label" id="uptime-label">Availability</span>
-                        <span id="uptime-1h" style="font-size: 0.8rem; font-weight: 600; color: var(--accent-green);">100%</span>
+                        <span id="uptime-1h"
+                            style="font-size: 0.8rem; font-weight: 600; color: var(--accent-green);">100%</span>
                     </div>
                     <div class="timeline-container">
                         <div id="availability-timeline" class="timeline-bars">
@@ -500,13 +526,15 @@
                 </div>
                 <div class="stat-item" style="grid-column: span 2;">
                     <span class="stat-label">Speed History (Mbps)</span>
-                    <div style="height: 150px !important; max-height: 150px !important; width: 100%; position: relative; margin-top: 10px; overflow: hidden;">
+                    <div
+                        style="height: 150px !important; max-height: 150px !important; width: 100%; position: relative; margin-top: 10px; overflow: hidden;">
                         <canvas id="speedChart" style="height: 150px !important; width: 100% !important;"></canvas>
                     </div>
                 </div>
                 <div class="stat-item" style="grid-column: span 2;">
                     <span class="stat-label">Ping History (ms)</span>
-                    <div style="height: 100px !important; max-height: 100px !important; width: 100%; position: relative; margin-top: 10px; overflow: hidden;">
+                    <div
+                        style="height: 100px !important; max-height: 100px !important; width: 100%; position: relative; margin-top: 10px; overflow: hidden;">
                         <canvas id="pingChart" style="height: 100px !important; width: 100% !important;"></canvas>
                     </div>
                 </div>
@@ -549,7 +577,7 @@
     <div id="admin-modal">
         <div class="modal-content">
             <h2 style="margin-bottom: 20px;" data-i18n="admin_settings">Admin Settings</h2>
-            
+
             <div id="login-view">
                 <div class="form-group">
                     <label data-i18n="admin_password">Admin Password</label>
@@ -591,13 +619,17 @@
                         <input type="text" id="conf-influxdb_bucket">
                     </div>
                 </div>
-                
-                <button onclick="saveSettings()" style="background: var(--accent-blue);" data-i18n="save_settings">Save Settings</button>
-                <button onclick="triggerSpeedtest()" id="btn-speedtest" style="background: var(--accent-green); margin-top: 10px;" data-i18n="run_speedtest">Run Speedtest Now</button>
+
+                <button onclick="saveSettings()" style="background: var(--accent-blue);" data-i18n="save_settings">Save
+                    Settings</button>
+                <button onclick="triggerSpeedtest()" id="btn-speedtest"
+                    style="background: var(--accent-green); margin-top: 10px;" data-i18n="run_speedtest">Run Speedtest
+                    Now</button>
             </div>
 
             <button onclick="hideAdmin()"
-                style="background: transparent; border: 1px solid var(--text-secondary); margin-top: 10px;" data-i18n="close">Close</button>
+                style="background: transparent; border: 1px solid var(--text-secondary); margin-top: 10px;"
+                data-i18n="close">Close</button>
         </div>
     </div>
 
@@ -688,6 +720,47 @@
                 toast_save_success: 'Einstellungen erfolgreich gespeichert!',
                 toast_speedtest_start: 'Speedtest gestartet! Das dauert etwa 60 Sek.',
                 no_events: 'Keine Ausfälle aufgezeichnet.'
+            },
+            sx: {
+                // Alles uff sächsisch!
+                checking: 'Guggn ma nach...',
+                waiting: 'Wart uff de Dadn...',
+                availability: 'Verfiechbarkeet',
+                last_24h: 'Letzte 24 Stundn',
+                last_7d: 'Letzte 7 Tage',
+                last_30d: 'Letzte 30 Tage',
+                last_90d: 'Letzte 90 Tage',
+                download: 'Runndorloodn',
+                upload: 'Hochloodn',
+                ping: 'Pling',
+                last_speedtest: 'Letzter Speed-Gugg',
+                recent_events: 'Was war\'n los?',
+                time: 'Uhrzeid',
+                event: 'Ereichnis',
+                admin_settings: 'Chef-Gedöns',
+                admin_password: 'Häuptlings-Passwort',
+                unlock_settings: 'Alles uffmachn',
+                ping_target: 'Ping-Ziel',
+                ping_interval: 'Ping-Abstand (s)',
+                speed_interval: 'Speedtest-Abstand (m)',
+                save_settings: 'Alles festhalde',
+                run_speedtest: 'Nu, Speedtest ma startn!',
+                close: 'Zu de Bude',
+                last_checked: 'Zuletzt geguggt',
+                ago: 'her',
+                last_label: 'Letzte',
+                now: 'Nu grade',
+                prev: 'Zrigge',
+                next: 'Näächste',
+                password_placeholder: 'Passwort zum Freischaltn eitippn',
+                connected: 'Verbunn!',
+                offline: 'Nischde!',
+                toast_unlocked: 'Alles uffgeschlossn',
+                toast_invalid: 'Nee, Passwort is falsch',
+                toast_error_save: 'Ging nich zu speichere',
+                toast_save_success: 'Alles gebongt!',
+                toast_speedtest_start: 'Speedtest läuft nu! Wart ma 60 Sek.',
+                no_events: "Nüscht passiert hier."
             }
         };
 
@@ -705,10 +778,14 @@
 
             document.getElementById('lang-en').className = currentLang === 'en' ? 'active' : '';
             document.getElementById('lang-de').className = currentLang === 'de' ? 'active' : '';
+            document.getElementById('lang-sx').className = currentLang === 'sx' ? 'active' : '';
         }
 
         function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'de' : 'en';
+            if (currentLang === 'en') currentLang = 'de';
+            else if (currentLang === 'de') currentLang = 'sx';
+            else currentLang = 'en';
+
             localStorage.setItem('lang', currentLang);
             updateUI();
             updateStatus(); // Refresh status displays with new locale
@@ -722,9 +799,9 @@
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `<span>${message}</span>`;
-            
+
             container.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.classList.add('fade-out');
                 setTimeout(() => toast.remove(), 300);
@@ -765,7 +842,7 @@
                         mode: 'index',
                         intersect: false,
                     },
-                    plugins: { 
+                    plugins: {
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: 'rgba(15, 23, 42, 0.9)',
@@ -776,7 +853,7 @@
                             padding: 10,
                             displayColors: true,
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     return ` ${context.dataset.label}: ${context.parsed.y} Mbps`;
                                 }
                             }
@@ -784,7 +861,7 @@
                     },
                     scales: {
                         x: { display: false },
-                        y: { 
+                        y: {
                             beginAtZero: true,
                             grid: { color: 'rgba(255, 255, 255, 0.05)' },
                             ticks: { color: '#94a3b8', font: { size: 10 } }
@@ -815,7 +892,7 @@
                         mode: 'index',
                         intersect: false,
                     },
-                    plugins: { 
+                    plugins: {
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: 'rgba(15, 23, 42, 0.9)',
@@ -826,7 +903,7 @@
                             padding: 10,
                             displayColors: true,
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     return ` ${context.dataset.label}: ${context.parsed.y} ms`;
                                 }
                             }
@@ -834,7 +911,7 @@
                     },
                     scales: {
                         x: { display: false },
-                        y: { 
+                        y: {
                             beginAtZero: false,
                             grid: { color: 'rgba(255, 255, 255, 0.05)' },
                             ticks: { color: '#94a3b8', font: { size: 10 } }
@@ -858,23 +935,23 @@
                     badge.className = 'status-badge status-offline';
                 }
 
-                const timeOptions = { 
+                const timeOptions = {
                     day: '2-digit', month: '2-digit', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit', second: '2-digit', 
-                    hour12: false 
+                    hour: '2-digit', minute: '2-digit', second: '2-digit',
+                    hour12: false
                 };
-                
+
                 if (data.last_ping) {
                     document.getElementById('last-ping').innerText = `${translations[currentLang].last_checked}: ${new Date(data.last_ping).toLocaleString(getLocale(), timeOptions)}`;
                 } else {
                     document.getElementById('last-ping').innerText = translations[currentLang].waiting;
                 }
-                
+
                 // Update Timeline (Bars)
                 const timeline = document.getElementById('availability-timeline');
                 timeline.innerHTML = '';
                 const pings = data.ping_history || [];
-                
+
                 // Calculate actual time range
                 if (pings.length > 1) {
                     const first = new Date(pings[0].time);
@@ -888,7 +965,7 @@
                 for (let i = 0; i < 60; i++) {
                     const bar = document.createElement('div');
                     bar.className = 'timeline-bar';
-                    
+
                     if (i < (60 - pings.length)) {
                         bar.classList.add('bar-empty');
                     } else {
@@ -914,20 +991,20 @@
 
                 // Update Charts
                 if (speedChart && data.speed_history && data.speed_history.length > 0) {
-                    speedChart.data.labels = data.speed_history.map(s => new Date(s.time).toLocaleTimeString(getLocale(), {hour: '2-digit', minute:'2-digit', hour12: false}));
+                    speedChart.data.labels = data.speed_history.map(s => new Date(s.time).toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit', hour12: false }));
                     speedChart.data.datasets[0].data = data.speed_history.map(s => s.download);
                     speedChart.data.datasets[1].data = data.speed_history.map(s => s.upload);
                     speedChart.update('none');
                 }
 
                 if (pingChart && data.ping_history && data.ping_history.length > 0) {
-                    pingChart.data.labels = data.ping_history.map(p => new Date(p.time).toLocaleTimeString(getLocale(), {hour: '2-digit', minute:'2-digit', second: '2-digit', hour12: false}));
+                    pingChart.data.labels = data.ping_history.map(p => new Date(p.time).toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }));
                     pingChart.data.datasets[0].data = data.ping_history.map(p => p.latency);
                     pingChart.update('none');
                 }
 
                 document.getElementById('latency').innerText = data.current_latency.toFixed(1) || '--';
-                
+
                 if (data.last_speedtest) {
                     const speedDate = new Date(data.last_speedtest.timestamp);
                     document.getElementById('last-speed-time').innerText = speedDate.toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -941,7 +1018,7 @@
             try {
                 const response = await fetch('api/uptime');
                 const data = await response.json();
-                
+
                 if (data['1h'] !== null) document.getElementById('uptime-1h').innerText = data['1h'].toFixed(3) + '%';
                 if (data['24h'] !== null) document.getElementById('uptime-24h').innerText = data['24h'].toFixed(3) + '%';
                 if (data['7d'] !== null) document.getElementById('uptime-7d').innerText = data['7d'].toFixed(3) + '%';
@@ -957,18 +1034,18 @@
             try {
                 const response = await fetch(`api/events?page=${currentPage}&limit=5`);
                 const data = await response.json();
-                
+
                 const body = document.getElementById('events-body');
                 body.innerHTML = '';
-                
+
                 if (data.length === 0) {
                     body.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-secondary);">${translations[currentLang].no_events}</td></tr>`;
                 } else {
                     data.forEach(event => {
                         const tr = document.createElement('tr');
-                        const timeStr = new Date(event.timestamp).toLocaleString(getLocale(), { 
+                        const timeStr = new Date(event.timestamp).toLocaleString(getLocale(), {
                             day: '2-digit', month: '2-digit', year: 'numeric',
-                            hour: '2-digit', minute: '2-digit', hour12: false 
+                            hour: '2-digit', minute: '2-digit', hour12: false
                         });
                         tr.innerHTML = `
                             <td>${timeStr}</td>
@@ -1005,7 +1082,7 @@
                 });
                 if (response.ok) {
                     const config = await response.json();
-                    
+
                     // Populate form
                     document.getElementById('conf-ping_target').value = config.ping_target || '8.8.8.8';
                     document.getElementById('conf-ping_interval').value = config.ping_interval;
@@ -1014,7 +1091,7 @@
                     document.getElementById('conf-influxdb_token').value = config.influxdb_token;
                     document.getElementById('conf-influxdb_org').value = config.influxdb_org || '';
                     document.getElementById('conf-influxdb_bucket').value = config.influxdb_bucket;
-                    
+
                     document.getElementById('login-view').style.display = 'none';
                     document.getElementById('settings-view').style.display = 'block';
                     showToast(translations[currentLang].toast_unlocked, 'info');
@@ -1040,13 +1117,13 @@
             try {
                 const response = await fetch('api/config', {
                     method: 'POST',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'application/json',
-                        'X-Admin-Password': adminPassword 
+                        'X-Admin-Password': adminPassword
                     },
                     body: JSON.stringify(config)
                 });
-                
+
                 if (response.ok) {
                     showToast(translations[currentLang].toast_save_success);
                     hideAdmin();
@@ -1066,7 +1143,7 @@
                 return;
             }
             try {
-                const response = await fetch('api/speedtest/trigger', { 
+                const response = await fetch('api/speedtest/trigger', {
                     method: 'POST',
                     headers: { 'X-Admin-Password': pass }
                 });
