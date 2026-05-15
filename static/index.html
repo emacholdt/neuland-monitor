@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internet Monitor</title>
+    <title>Neuland Monitor</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -48,8 +49,13 @@
         }
 
         @keyframes move {
-            from { transform: translate(0, 0); }
-            to { transform: translate(200px, 200px); }
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(200px, 200px);
+            }
         }
 
         .container {
@@ -95,9 +101,17 @@
         }
 
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 1;
+            }
         }
 
         h1 {
@@ -209,15 +223,16 @@
         }
     </style>
 </head>
+
 <body>
     <div class="background-blob"></div>
-    
+
     <div class="container">
         <div class="card" id="main-card">
             <div id="status-badge" class="status-badge status-online">
                 Checking...
             </div>
-            <h1>Home Network</h1>
+            <h1>Neuland Monitor</h1>
             <p class="last-update" id="last-ping">Waiting for data...</p>
 
             <div class="stats-grid">
@@ -253,7 +268,8 @@
             <h2 style="margin-bottom: 20px;">Admin Access</h2>
             <input type="password" id="admin-pass" placeholder="Password">
             <button onclick="loginAdmin()">Login</button>
-            <button onclick="hideAdmin()" style="background: transparent; border: 1px solid var(--text-secondary); margin-top: 10px;">Cancel</button>
+            <button onclick="hideAdmin()"
+                style="background: transparent; border: 1px solid var(--text-secondary); margin-top: 10px;">Cancel</button>
         </div>
     </div>
 
@@ -276,10 +292,10 @@
                 document.getElementById('download').innerText = data.download_mbps || '--';
                 document.getElementById('upload').innerText = data.upload_mbps || '--';
                 document.getElementById('latency').innerText = data.current_latency.toFixed(1) || '--';
-                
+
                 if (data.last_speedtest) {
                     const speedDate = new Date(data.last_speedtest.timestamp);
-                    document.getElementById('last-speed-time').innerText = speedDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    document.getElementById('last-speed-time').innerText = speedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 }
             } catch (error) {
                 console.error('Failed to fetch status:', error);
@@ -315,4 +331,5 @@
         setInterval(updateStatus, 5000);
     </script>
 </body>
+
 </html>

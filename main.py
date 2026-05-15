@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     influxdb_url: str = "http://localhost:8086"
     influxdb_token: str = "your-token"
     influxdb_org: str = "your-org"
-    influxdb_bucket: str = "internet_monitor"
+    influxdb_bucket: str = "neuland_monitor"
     
     ping_target: str = "8.8.8.8"
     ping_interval: int = 60  # seconds
@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-app = FastAPI(title="Internet Monitor")
+app = FastAPI(title="Neuland Monitor")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Shared state for the dashboard

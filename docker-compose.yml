@@ -1,7 +1,7 @@
 services:
-  internet-monitor:
+  neuland-monitor:
     build: .
-    container_name: internet-monitor
+    container_name: neuland-monitor
     restart: unless-stopped
     ports:
       - "8181:8181"
