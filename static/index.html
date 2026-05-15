@@ -826,7 +826,7 @@
 
         async function updateStatus() {
             try {
-                const response = await fetch('/api/status');
+                const response = await fetch('api/status');
                 const data = await response.json();
 
                 const badge = document.getElementById('status-badge');
@@ -919,7 +919,7 @@
 
         async function updateUptime() {
             try {
-                const response = await fetch('/api/uptime');
+                const response = await fetch('api/uptime');
                 const data = await response.json();
                 
                 if (data['1h'] !== null) document.getElementById('uptime-1h').innerText = data['1h'].toFixed(3) + '%';
@@ -935,7 +935,7 @@
         let currentPage = 1;
         async function updateEvents() {
             try {
-                const response = await fetch(`/api/events?page=${currentPage}&limit=5`);
+                const response = await fetch(`api/events?page=${currentPage}&limit=5`);
                 const data = await response.json();
                 
                 const body = document.getElementById('events-body');
@@ -980,7 +980,7 @@
         async function loginAdmin() {
             adminPassword = document.getElementById('admin-pass').value;
             try {
-                const response = await fetch('/api/config', {
+                const response = await fetch('api/config', {
                     headers: { 'X-Admin-Password': adminPassword }
                 });
                 if (response.ok) {
@@ -1018,7 +1018,7 @@
             };
 
             try {
-                const response = await fetch('/api/config', {
+                const response = await fetch('api/config', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -1046,7 +1046,7 @@
                 return;
             }
             try {
-                const response = await fetch('/api/speedtest/trigger', { 
+                const response = await fetch('api/speedtest/trigger', { 
                     method: 'POST',
                     headers: { 'X-Admin-Password': pass }
                 });
