@@ -236,6 +236,12 @@
             <p class="last-update" id="last-ping">Waiting for data...</p>
 
             <div class="stats-grid">
+                <div class="stat-item" style="grid-column: span 2;">
+                    <span class="stat-label">Availability (Last 60m)</span>
+                    <div id="availability-timeline" style="display: flex; gap: 4px; height: 20px; margin-top: 10px;">
+                        <!-- Dots will be generated here -->
+                    </div>
+                </div>
                 <div class="stat-item">
                     <span class="stat-label">Download</span>
                     <span class="stat-value" id="download">--</span>
@@ -245,6 +251,10 @@
                     <span class="stat-label">Upload</span>
                     <span class="stat-value" id="upload">--</span>
                     <span class="stat-unit">Mbps</span>
+                </div>
+                <div class="stat-item" style="grid-column: span 2; padding: 10px;">
+                    <span class="stat-label">Speed History</span>
+                    <canvas id="speedChart" style="width: 100%; height: 150px;"></canvas>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Ping</span>
@@ -267,13 +277,59 @@
         <div class="modal-content">
             <h2 style="margin-bottom: 20px;">Admin Access</h2>
             <input type="password" id="admin-pass" placeholder="Password">
-            <button onclick="loginAdmin()">Login</button>
+            <button onclick="loginAdmin()">View Config</button>
+            <button onclick="triggerSpeedtest()" id="btn-speedtest" style="background: var(--accent-green); margin-top: 10px;">Run Speedtest Now</button>
             <button onclick="hideAdmin()"
                 style="background: transparent; border: 1px solid var(--text-secondary); margin-top: 10px;">Cancel</button>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        let adminPassword = '';
+        let speedChart = null;
+
+        function initChart() {
+            const ctx = document.getElementById('speedChart').getContext('2d');
+            speedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Down',
+                            data: [],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Up',
+                            data: [],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { 
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
         async function updateStatus() {
             try {
                 const response = await fetch('/api/status');
@@ -289,10 +345,49 @@
                 }
 
                 document.getElementById('last-ping').innerText = `Last checked: ${new Date(data.last_ping).toLocaleTimeString()}`;
-                document.getElementById('download').innerText = data.download_mbps || '--';
-                document.getElementById('upload').innerText = data.upload_mbps || '--';
-                document.getElementById('latency').innerText = data.current_latency.toFixed(1) || '--';
+                
+                // Update Timeline
+                const timeline = document.getElementById('availability-timeline');
+                timeline.innerHTML = '';
+                // Fill up to 60 dots
+                const pings = data.ping_history || [];
+                for (let i = 0; i < 60; i++) {
+                    const dot = document.createElement('div');
+                    dot.style.flex = '1';
+                    dot.style.borderRadius = '2px';
+                    if (i < (60 - pings.length)) {
+                        dot.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    } else {
+                        const p = pings[i - (60 - pings.length)];
+                        dot.style.backgroundColor = p.online ? 'var(--accent-green)' : 'var(--accent-red)';
+                        dot.title = `${new Date(p.time).toLocaleTimeString()}: ${p.online ? 'Online' : 'Offline'}`;
+                    }
+                    timeline.appendChild(dot);
+                }
 
+                // Show loading for speedtest if running
+                if (data.is_running_speedtest) {
+                    document.getElementById('download').innerText = '...';
+                    document.getElementById('upload').innerText = '...';
+                    document.getElementById('btn-speedtest').innerText = 'Running...';
+                    document.getElementById('btn-speedtest').disabled = true;
+                } else {
+                    document.getElementById('download').innerText = data.download_mbps || '--';
+                    document.getElementById('upload').innerText = data.upload_mbps || '--';
+                    document.getElementById('btn-speedtest').innerText = 'Run Speedtest Now';
+                    document.getElementById('btn-speedtest').disabled = false;
+                }
+
+                // Update Chart
+                if (speedChart && data.speed_history && data.speed_history.length > 0) {
+                    speedChart.data.labels = data.speed_history.map(s => new Date(s.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
+                    speedChart.data.datasets[0].data = data.speed_history.map(s => s.download);
+                    speedChart.data.datasets[1].data = data.speed_history.map(s => s.upload);
+                    speedChart.update('none');
+                }
+
+                document.getElementById('latency').innerText = data.current_latency.toFixed(1) || '--';
+                
                 if (data.last_speedtest) {
                     const speedDate = new Date(data.last_speedtest.timestamp);
                     document.getElementById('last-speed-time').innerText = speedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -311,9 +406,9 @@
         }
 
         async function loginAdmin() {
-            const pass = document.getElementById('admin-pass').value;
+            adminPassword = document.getElementById('admin-pass').value;
             try {
-                const response = await fetch(`/api/config?password=${pass}`);
+                const response = await fetch(`/api/config?password=${adminPassword}`);
                 if (response.ok) {
                     const config = await response.json();
                     alert(`Config:\nPing: every ${config.ping_interval}s\nSpeedtest: every ${config.speedtest_interval}m\nInfluxDB: ${config.influxdb_url}`);
@@ -326,7 +421,29 @@
             }
         }
 
+        async function triggerSpeedtest() {
+            const pass = document.getElementById('admin-pass').value || adminPassword;
+            if (!pass) {
+                alert('Please enter password first');
+                return;
+            }
+            try {
+                const response = await fetch(`/api/speedtest/trigger?password=${pass}`, { method: 'POST' });
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Speedtest started! It will take about 30-60 seconds.');
+                    hideAdmin();
+                    updateStatus();
+                } else {
+                    alert(`Error: ${result.detail || result.status}`);
+                }
+            } catch (error) {
+                alert('Connection error');
+            }
+        }
+
         // Initial update and interval
+        initChart();
         updateStatus();
         setInterval(updateStatus, 5000);
     </script>

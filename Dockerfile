@@ -25,4 +25,4 @@ COPY . .
 EXPOSE 8181
 
 # Accept license on first run is handled in main.py via flags
-CMD ["uvicorn", "main.py:app", "--host", "0.0.0.0", "--port", "8181"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8181"]

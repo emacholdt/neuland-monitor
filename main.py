@@ -47,6 +47,9 @@ state = {
     "current_latency": 0.0,
     "download_mbps": 0.0,
     "upload_mbps": 0.0,
+    "is_running_speedtest": False,
+    "ping_history": [],  # List of {time, latency, online}
+    "speed_history": [], # List of {time, download, upload}
 }
 
 # InfluxDB Client
@@ -112,9 +115,15 @@ async def connectivity_loop():
     while True:
         is_online, latency = run_ping()
         state["is_online"] = is_online
-        state["last_ping"] = datetime.utcnow().isoformat()
-        state["current_latency"] = latency
-        
+        # Update history (keep last 60 pings)
+        state["ping_history"].append({
+            "time": state["last_ping"],
+            "latency": latency,
+            "online": is_online
+        })
+        if len(state["ping_history"]) > 60:
+            state["ping_history"].pop(0)
+
         # Write to InfluxDB
         try:
             point = Point("connectivity") \
@@ -131,27 +140,43 @@ async def speedtest_loop():
     # Initial wait to let connectivity settle
     await asyncio.sleep(10)
     while True:
-        # Only run speedtest if we are online
-        if state["is_online"]:
-            res = run_speedtest()
-            if res:
-                state["last_speedtest"] = res
-                state["download_mbps"] = res["download"]
-                state["upload_mbps"] = res["upload"]
-                
-                # Write to InfluxDB
-                try:
-                    point = Point("internet_speed") \
-                        .field("download", res["download"]) \
-                        .field("upload", res["upload"]) \
-                        .field("latency", res["latency"])
-                    write_api.write(bucket=settings.influxdb_bucket, record=point)
-                    logger.info(f"Speedtest result saved: {res['download']} Mbps down / {res['upload']} Mbps up")
-                except Exception as e:
-                    logger.error(f"Failed to write speedtest to InfluxDB: {e}")
+        # Only run speedtest if we are online and not already running one
+        if state["is_online"] and not state["is_running_speedtest"]:
+            await perform_speedtest()
         
         # Sleep for the configured interval (converted to seconds)
         await asyncio.sleep(settings.speedtest_interval * 60)
+
+async def perform_speedtest():
+    state["is_running_speedtest"] = True
+    try:
+        res = run_speedtest()
+        if res:
+            state["last_speedtest"] = res
+            state["download_mbps"] = res["download"]
+            state["upload_mbps"] = res["upload"]
+            
+            # Update history (keep last 20 speedtests)
+            state["speed_history"].append({
+                "time": res["timestamp"],
+                "download": res["download"],
+                "upload": res["upload"]
+            })
+            if len(state["speed_history"]) > 20:
+                state["speed_history"].pop(0)
+
+            # Write to InfluxDB
+            try:
+                point = Point("internet_speed") \
+                    .field("download", res["download"]) \
+                    .field("upload", res["upload"]) \
+                    .field("latency", res["latency"])
+                write_api.write(bucket=settings.influxdb_bucket, record=point)
+                logger.info(f"Speedtest result saved: {res['download']} Mbps down / {res['upload']} Mbps up")
+            except Exception as e:
+                logger.error(f"Failed to write speedtest to InfluxDB: {e}")
+    finally:
+        state["is_running_speedtest"] = False
 
 @app.on_event("startup")
 async def startup_event():
@@ -177,6 +202,21 @@ async def get_config(password: Optional[str] = None):
         "influxdb_url": settings.influxdb_url,
         "influxdb_bucket": settings.influxdb_bucket,
     }
+
+@app.post("/api/speedtest/trigger")
+async def trigger_speedtest(password: Optional[str] = None):
+    if password != settings.admin_password:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    
+    if state["is_running_speedtest"]:
+        return {"status": "already_running"}
+    
+    if not state["is_online"]:
+        return {"status": "offline_cannot_run"}
+
+    # Start speedtest in the background
+    asyncio.create_task(perform_speedtest())
+    return {"status": "started"}
 
 if __name__ == "__main__":
     import uvicorn
