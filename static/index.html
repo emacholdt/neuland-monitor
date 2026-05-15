@@ -114,6 +114,45 @@
             }
         }
 
+        .timeline-container {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .timeline-bars {
+            display: flex;
+            gap: 2px;
+            height: 30px;
+            align-items: flex-end;
+        }
+
+        .timeline-bar {
+            flex: 1;
+            height: 100%;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .timeline-bar:hover {
+            transform: scaleY(1.2);
+            filter: brightness(1.2);
+        }
+
+        .bar-online { background-color: var(--accent-green); }
+        .bar-offline { background-color: var(--accent-red); }
+        .bar-empty { background-color: rgba(255, 255, 255, 0.1); }
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
         h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
@@ -195,19 +234,33 @@
             padding: 30px;
             border-radius: 20px;
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 5px;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 10px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             color: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         button {
@@ -220,54 +273,254 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+            font-weight: 500;
+            min-width: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        .toast-success { border-left: 4px solid var(--accent-green); }
+        .toast-error { border-left: 4px solid var(--accent-red); }
+        .toast-info { border-left: 4px solid var(--accent-blue); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.fade-out {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .lang-switch {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .lang-switch span.active {
+            color: white;
+            font-weight: 600;
+        }
+
+        .uptime-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .uptime-item {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .uptime-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .uptime-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .events-table-container {
+            margin-top: 30px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .events-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .events-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .events-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .pagination button {
+            width: auto;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 
 <body>
+    <div id="toast-container"></div>
+    <div class="lang-switch" onclick="toggleLanguage()">
+        <span id="lang-en">EN</span> | <span id="lang-de">DE</span>
+    </div>
     <div class="background-blob"></div>
 
     <div class="container">
         <div class="card" id="main-card">
-            <div id="status-badge" class="status-badge status-online">
+            <div id="status-badge" class="status-badge status-online" data-i18n="checking">
                 Checking...
             </div>
             <h1>Neuland Monitor</h1>
-            <p class="last-update" id="last-ping">Waiting for data...</p>
+            <p class="last-update" id="last-ping" data-i18n="waiting">Waiting for data...</p>
 
             <div class="stats-grid">
                 <div class="stat-item" style="grid-column: span 2;">
-                    <span class="stat-label">Availability (Last 60m)</span>
-                    <div id="availability-timeline" style="display: flex; gap: 4px; height: 20px; margin-top: 10px;">
-                        <!-- Dots will be generated here -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                        <span class="stat-label" id="uptime-label">Availability</span>
+                        <span id="uptime-1h" style="font-size: 0.8rem; font-weight: 600; color: var(--accent-green);">100%</span>
+                    </div>
+                    <div class="timeline-container">
+                        <div id="availability-timeline" class="timeline-bars">
+                            <!-- Bars will be generated here -->
+                        </div>
+                        <div class="timeline-labels">
+                            <span id="label-start">60 min ago</span>
+                            <span data-i18n="now">Now</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-item" style="grid-column: span 2; background: transparent; border: none; padding: 0;">
+                    <div class="uptime-grid">
+                        <div class="uptime-item">
+                            <span class="uptime-label" data-i18n="last_24h">Last 24 hours</span>
+                            <span class="uptime-value" id="uptime-24h">---%</span>
+                        </div>
+                        <div class="uptime-item">
+                            <span class="uptime-label" data-i18n="last_7d">Last 7 days</span>
+                            <span class="uptime-value" id="uptime-7d">---%</span>
+                        </div>
+                        <div class="uptime-item">
+                            <span class="uptime-label" data-i18n="last_30d">Last 30 days</span>
+                            <span class="uptime-value" id="uptime-30h">---%</span>
+                        </div>
+                        <div class="uptime-item">
+                            <span class="uptime-label" data-i18n="last_90d">Last 90 days</span>
+                            <span class="uptime-value" id="uptime-90h">---%</span>
+                        </div>
                     </div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Download</span>
+                    <span class="stat-label" data-i18n="download">Download</span>
                     <span class="stat-value" id="download">--</span>
                     <span class="stat-unit">Mbps</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Upload</span>
+                    <span class="stat-label" data-i18n="upload">Upload</span>
                     <span class="stat-value" id="upload">--</span>
                     <span class="stat-unit">Mbps</span>
                 </div>
-                <div class="stat-item" style="grid-column: span 2; padding: 10px;">
-                    <span class="stat-label">Speed History</span>
-                    <canvas id="speedChart" style="width: 100%; height: 150px;"></canvas>
+                <div class="stat-item" style="grid-column: span 2;">
+                    <span class="stat-label">Speed History (Mbps)</span>
+                    <div style="height: 150px !important; max-height: 150px !important; width: 100%; position: relative; margin-top: 10px; overflow: hidden;">
+                        <canvas id="speedChart" style="height: 150px !important; width: 100% !important;"></canvas>
+                    </div>
+                </div>
+                <div class="stat-item" style="grid-column: span 2;">
+                    <span class="stat-label">Ping History (ms)</span>
+                    <div style="height: 100px !important; max-height: 100px !important; width: 100%; position: relative; margin-top: 10px; overflow: hidden;">
+                        <canvas id="pingChart" style="height: 100px !important; width: 100% !important;"></canvas>
+                    </div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Ping</span>
+                    <span class="stat-label" data-i18n="ping">Ping</span>
                     <span class="stat-value" id="latency">--</span>
                     <span class="stat-unit">ms</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Last Speedtest</span>
+                    <span class="stat-label" data-i18n="last_speedtest">Last Speedtest</span>
                     <span class="stat-value" id="last-speed-time" style="font-size: 0.9rem;">--</span>
                 </div>
             </div>
 
-            <div class="footer" onclick="showAdmin()">
+            <div class="events-table-container">
+                <span class="stat-label" data-i18n="recent_events">Recent Events</span>
+                <table class="events-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="time">Time</th>
+                            <th data-i18n="event">Event</th>
+                        </tr>
+                    </thead>
+                    <tbody id="events-body">
+                        <!-- Events will be listed here -->
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    <button onclick="changePage(-1)" id="btn-prev" data-i18n="prev">Prev</button>
+                    <button onclick="changePage(1)" id="btn-next" data-i18n="next">Next</button>
+                </div>
+            </div>
+
+            <div class="footer" onclick="showAdmin()" data-i18n="admin_settings">
                 Admin Settings
             </div>
         </div>
@@ -275,12 +528,56 @@
 
     <div id="admin-modal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 20px;">Admin Access</h2>
-            <input type="password" id="admin-pass" placeholder="Password">
-            <button onclick="loginAdmin()">View Config</button>
-            <button onclick="triggerSpeedtest()" id="btn-speedtest" style="background: var(--accent-green); margin-top: 10px;">Run Speedtest Now</button>
+            <h2 style="margin-bottom: 20px;" data-i18n="admin_settings">Admin Settings</h2>
+            
+            <div id="login-view">
+                <div class="form-group">
+                    <label data-i18n="admin_password">Admin Password</label>
+                    <input type="password" id="admin-pass" data-i18n-placeholder="password_placeholder">
+                </div>
+                <button onclick="loginAdmin()" data-i18n="unlock_settings">Unlock Settings</button>
+            </div>
+
+            <div id="settings-view" style="display: none;">
+                <div class="form-group">
+                    <label data-i18n="ping_target">Ping Target</label>
+                    <input type="text" id="conf-ping_target">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label data-i18n="ping_interval">Ping Interval (s)</label>
+                        <input type="number" id="conf-ping_interval">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="speed_interval">Speedtest Interval (m)</label>
+                        <input type="number" id="conf-speedtest_interval">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>InfluxDB URL</label>
+                    <input type="text" id="conf-influxdb_url">
+                </div>
+                <div class="form-group">
+                    <label>InfluxDB Token</label>
+                    <input type="password" id="conf-influxdb_token">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>InfluxDB Org</label>
+                        <input type="text" id="conf-influxdb_org">
+                    </div>
+                    <div class="form-group">
+                        <label>InfluxDB Bucket</label>
+                        <input type="text" id="conf-influxdb_bucket">
+                    </div>
+                </div>
+                
+                <button onclick="saveSettings()" style="background: var(--accent-blue);" data-i18n="save_settings">Save Settings</button>
+                <button onclick="triggerSpeedtest()" id="btn-speedtest" style="background: var(--accent-green); margin-top: 10px;" data-i18n="run_speedtest">Run Speedtest Now</button>
+            </div>
+
             <button onclick="hideAdmin()"
-                style="background: transparent; border: 1px solid var(--text-secondary); margin-top: 10px;">Cancel</button>
+                style="background: transparent; border: 1px solid var(--text-secondary); margin-top: 10px;" data-i18n="close">Close</button>
         </div>
     </div>
 
@@ -288,10 +585,135 @@
     <script>
         let adminPassword = '';
         let speedChart = null;
+        let pingChart = null;
+        let currentLang = localStorage.getItem('lang') || 'en';
 
-        function initChart() {
-            const ctx = document.getElementById('speedChart').getContext('2d');
-            speedChart = new Chart(ctx, {
+        const translations = {
+            en: {
+                checking: 'Checking...',
+                waiting: 'Waiting for data...',
+                availability: 'Availability',
+                last_24h: 'Last 24 hours',
+                last_7d: 'Last 7 days',
+                last_30d: 'Last 30 days',
+                last_90d: 'Last 90 days',
+                download: 'Download',
+                upload: 'Upload',
+                ping: 'Ping',
+                last_speedtest: 'Last Speedtest',
+                recent_events: 'Recent Events',
+                time: 'Time',
+                event: 'Event',
+                admin_settings: 'Admin Settings',
+                admin_password: 'Admin Password',
+                unlock_settings: 'Unlock Settings',
+                ping_target: 'Ping Target',
+                ping_interval: 'Ping Interval (s)',
+                speed_interval: 'Speedtest Interval (m)',
+                save_settings: 'Save Settings',
+                run_speedtest: 'Run Speedtest Now',
+                close: 'Close',
+                last_checked: 'Last checked',
+                ago: 'ago',
+                last_label: 'Last',
+                now: 'Now',
+                prev: 'Prev',
+                next: 'Next',
+                password_placeholder: 'Enter password to unlock',
+                connected: 'Connected',
+                offline: 'Offline',
+                toast_unlocked: 'Settings unlocked',
+                toast_invalid: 'Invalid password',
+                toast_error_save: 'Error saving settings',
+                toast_save_success: 'Settings saved successfully!',
+                toast_speedtest_start: 'Speedtest started! This will take about 60s.',
+                no_events: 'No downtime events recorded.'
+            },
+            de: {
+                checking: 'Prüfen...',
+                waiting: 'Warte auf Daten...',
+                availability: 'Verfügbarkeit',
+                last_24h: 'Letzte 24 Stunden',
+                last_7d: 'Letzte 7 Tage',
+                last_30d: 'Letzte 30 Tage',
+                last_90d: 'Letzte 90 Tage',
+                download: 'Download',
+                upload: 'Upload',
+                ping: 'Ping',
+                last_speedtest: 'Letzter Speedtest',
+                recent_events: 'Letzte Ereignisse',
+                time: 'Zeit',
+                event: 'Ereignis',
+                admin_settings: 'Admin-Einstellungen',
+                admin_password: 'Admin-Passwort',
+                unlock_settings: 'Einstellungen freischalten',
+                ping_target: 'Ping-Ziel',
+                ping_interval: 'Ping-Intervall (s)',
+                speed_interval: 'Speedtest-Intervall (m)',
+                save_settings: 'Einstellungen speichern',
+                run_speedtest: 'Speedtest jetzt starten',
+                close: 'Schließen',
+                last_checked: 'Zuletzt geprüft',
+                ago: 'her',
+                last_label: 'Letzte',
+                now: 'Jetzt',
+                prev: 'Zurück',
+                next: 'Weiter',
+                password_placeholder: 'Passwort zum Freischalten eingeben',
+                connected: 'Verbunden',
+                offline: 'Offline',
+                toast_unlocked: 'Einstellungen freigeschaltet',
+                toast_invalid: 'Ungültiges Passwort',
+                toast_error_save: 'Fehler beim Speichern',
+                toast_save_success: 'Einstellungen erfolgreich gespeichert!',
+                toast_speedtest_start: 'Speedtest gestartet! Das dauert etwa 60 Sek.',
+                no_events: 'Keine Ausfälle aufgezeichnet.'
+            }
+        };
+
+        function updateUI() {
+            const lang = translations[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (lang[key]) el.innerText = lang[key];
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (lang[key]) el.placeholder = lang[key];
+            });
+
+            document.getElementById('lang-en').className = currentLang === 'en' ? 'active' : '';
+            document.getElementById('lang-de').className = currentLang === 'de' ? 'active' : '';
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'de' : 'en';
+            localStorage.setItem('lang', currentLang);
+            updateUI();
+            updateStatus(); // Refresh status displays with new locale
+            updateEvents();
+        }
+
+        const getLocale = () => currentLang === 'de' ? 'de-DE' : 'en-GB';
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function initCharts() {
+            const speedCtx = document.getElementById('speedChart').getContext('2d');
+            speedChart = new Chart(speedCtx, {
                 type: 'line',
                 data: {
                     labels: [],
@@ -302,7 +724,8 @@
                             borderColor: '#10b981',
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
                             fill: true,
-                            tension: 0.4
+                            tension: 0.4,
+                            pointRadius: 0
                         },
                         {
                             label: 'Up',
@@ -310,18 +733,89 @@
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             fill: true,
-                            tension: 0.4
+                            tension: 0.4,
+                            pointRadius: 0
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#94a3b8',
+                            bodyColor: '#f8fafc',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${context.parsed.y} Mbps`;
+                                }
+                            }
+                        }
+                    },
                     scales: {
                         x: { display: false },
                         y: { 
                             beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            const pingCtx = document.getElementById('pingChart').getContext('2d');
+            pingChart = new Chart(pingCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Ping',
+                        data: [],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#94a3b8',
+                            bodyColor: '#f8fafc',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${context.parsed.y} ms`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: { 
+                            beginAtZero: false,
                             grid: { color: 'rgba(255, 255, 255, 0.05)' },
                             ticks: { color: '#94a3b8', font: { size: 10 } }
                         }
@@ -337,68 +831,146 @@
 
                 const badge = document.getElementById('status-badge');
                 if (data.is_online) {
-                    badge.innerText = '● Connected';
+                    badge.innerText = `● ${translations[currentLang].connected}`;
                     badge.className = 'status-badge status-online';
                 } else {
-                    badge.innerText = '○ Offline';
+                    badge.innerText = `○ ${translations[currentLang].offline}`;
                     badge.className = 'status-badge status-offline';
                 }
 
-                document.getElementById('last-ping').innerText = `Last checked: ${new Date(data.last_ping).toLocaleTimeString()}`;
+                const timeOptions = { 
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', 
+                    hour12: false 
+                };
                 
-                // Update Timeline
+                if (data.last_ping) {
+                    document.getElementById('last-ping').innerText = `${translations[currentLang].last_checked}: ${new Date(data.last_ping).toLocaleString(getLocale(), timeOptions)}`;
+                } else {
+                    document.getElementById('last-ping').innerText = translations[currentLang].waiting;
+                }
+                
+                // Update Timeline (Bars)
                 const timeline = document.getElementById('availability-timeline');
                 timeline.innerHTML = '';
-                // Fill up to 60 dots
                 const pings = data.ping_history || [];
+                
+                // Calculate actual time range
+                if (pings.length > 1) {
+                    const first = new Date(pings[0].time);
+                    const last = new Date(pings[pings.length - 1].time);
+                    const diffMins = Math.round((last - first) / 60000);
+                    document.getElementById('uptime-label').innerText = `${translations[currentLang].availability} (${translations[currentLang].last_label} ${diffMins} min)`;
+                    document.getElementById('label-start').innerText = `${diffMins} min ${translations[currentLang].ago}`;
+                }
+
+                // We want to show exactly 60 bars
                 for (let i = 0; i < 60; i++) {
-                    const dot = document.createElement('div');
-                    dot.style.flex = '1';
-                    dot.style.borderRadius = '2px';
+                    const bar = document.createElement('div');
+                    bar.className = 'timeline-bar';
+                    
                     if (i < (60 - pings.length)) {
-                        dot.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                        bar.classList.add('bar-empty');
                     } else {
                         const p = pings[i - (60 - pings.length)];
-                        dot.style.backgroundColor = p.online ? 'var(--accent-green)' : 'var(--accent-red)';
-                        dot.title = `${new Date(p.time).toLocaleTimeString()}: ${p.online ? 'Online' : 'Offline'}`;
+                        bar.classList.add(p.online ? 'bar-online' : 'bar-offline');
+                        bar.title = `${new Date(p.time).toLocaleTimeString(getLocale(), timeOptions)}: ${p.online ? translations[currentLang].connected : translations[currentLang].offline}`;
                     }
-                    timeline.appendChild(dot);
+                    timeline.appendChild(bar);
                 }
 
                 // Show loading for speedtest if running
                 if (data.is_running_speedtest) {
                     document.getElementById('download').innerText = '...';
                     document.getElementById('upload').innerText = '...';
-                    document.getElementById('btn-speedtest').innerText = 'Running...';
+                    document.getElementById('btn-speedtest').innerText = '...';
                     document.getElementById('btn-speedtest').disabled = true;
                 } else {
                     document.getElementById('download').innerText = data.download_mbps || '--';
                     document.getElementById('upload').innerText = data.upload_mbps || '--';
-                    document.getElementById('btn-speedtest').innerText = 'Run Speedtest Now';
+                    document.getElementById('btn-speedtest').innerText = translations[currentLang].run_speedtest;
                     document.getElementById('btn-speedtest').disabled = false;
                 }
 
-                // Update Chart
+                // Update Charts
                 if (speedChart && data.speed_history && data.speed_history.length > 0) {
-                    speedChart.data.labels = data.speed_history.map(s => new Date(s.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
+                    speedChart.data.labels = data.speed_history.map(s => new Date(s.time).toLocaleTimeString(getLocale(), {hour: '2-digit', minute:'2-digit', hour12: false}));
                     speedChart.data.datasets[0].data = data.speed_history.map(s => s.download);
                     speedChart.data.datasets[1].data = data.speed_history.map(s => s.upload);
                     speedChart.update('none');
+                }
+
+                if (pingChart && data.ping_history && data.ping_history.length > 0) {
+                    pingChart.data.labels = data.ping_history.map(p => new Date(p.time).toLocaleTimeString(getLocale(), {hour: '2-digit', minute:'2-digit', second: '2-digit', hour12: false}));
+                    pingChart.data.datasets[0].data = data.ping_history.map(p => p.latency);
+                    pingChart.update('none');
                 }
 
                 document.getElementById('latency').innerText = data.current_latency.toFixed(1) || '--';
                 
                 if (data.last_speedtest) {
                     const speedDate = new Date(data.last_speedtest.timestamp);
-                    document.getElementById('last-speed-time').innerText = speedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('last-speed-time').innerText = speedDate.toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit', hour12: false });
                 }
             } catch (error) {
                 console.error('Failed to fetch status:', error);
             }
         }
 
+        async function updateUptime() {
+            try {
+                const response = await fetch('/api/uptime');
+                const data = await response.json();
+                
+                if (data['1h'] !== null) document.getElementById('uptime-1h').innerText = data['1h'].toFixed(3) + '%';
+                if (data['24h'] !== null) document.getElementById('uptime-24h').innerText = data['24h'].toFixed(3) + '%';
+                if (data['7d'] !== null) document.getElementById('uptime-7d').innerText = data['7d'].toFixed(3) + '%';
+                if (data['30d'] !== null) document.getElementById('uptime-30h').innerText = data['30d'].toFixed(3) + '%';
+                if (data['90d'] !== null) document.getElementById('uptime-90h').innerText = data['90d'].toFixed(3) + '%';
+            } catch (error) {
+                console.error('Failed to fetch uptime:', error);
+            }
+        }
+
+        let currentPage = 1;
+        async function updateEvents() {
+            try {
+                const response = await fetch(`/api/events?page=${currentPage}&limit=5`);
+                const data = await response.json();
+                
+                const body = document.getElementById('events-body');
+                body.innerHTML = '';
+                
+                if (data.length === 0) {
+                    body.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-secondary);">${translations[currentLang].no_events}</td></tr>`;
+                } else {
+                    data.forEach(event => {
+                        const tr = document.createElement('tr');
+                        const timeStr = new Date(event.timestamp).toLocaleString(getLocale(), { 
+                            day: '2-digit', month: '2-digit', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit', hour12: false 
+                        });
+                        tr.innerHTML = `
+                            <td>${timeStr}</td>
+                            <td style="color: var(--accent-red); font-weight: 600;">${translations[currentLang].offline}</td>
+                        `;
+                        body.appendChild(tr);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to fetch events:', error);
+            }
+        }
+
+        function changePage(delta) {
+            currentPage = Math.max(1, currentPage + delta);
+            updateEvents();
+        }
+
         function showAdmin() {
             document.getElementById('admin-modal').style.display = 'flex';
+            document.getElementById('login-view').style.display = 'block';
+            document.getElementById('settings-view').style.display = 'none';
         }
 
         function hideAdmin() {
@@ -408,44 +980,99 @@
         async function loginAdmin() {
             adminPassword = document.getElementById('admin-pass').value;
             try {
-                const response = await fetch(`/api/config?password=${adminPassword}`);
+                const response = await fetch('/api/config', {
+                    headers: { 'X-Admin-Password': adminPassword }
+                });
                 if (response.ok) {
                     const config = await response.json();
-                    alert(`Config:\nPing: every ${config.ping_interval}s\nSpeedtest: every ${config.speedtest_interval}m\nInfluxDB: ${config.influxdb_url}`);
-                    hideAdmin();
+                    
+                    // Populate form
+                    document.getElementById('conf-ping_target').value = config.ping_target || '8.8.8.8';
+                    document.getElementById('conf-ping_interval').value = config.ping_interval;
+                    document.getElementById('conf-speedtest_interval').value = config.speedtest_interval;
+                    document.getElementById('conf-influxdb_url').value = config.influxdb_url;
+                    document.getElementById('conf-influxdb_token').value = config.influxdb_token;
+                    document.getElementById('conf-influxdb_org').value = config.influxdb_org || '';
+                    document.getElementById('conf-influxdb_bucket').value = config.influxdb_bucket;
+                    
+                    document.getElementById('login-view').style.display = 'none';
+                    document.getElementById('settings-view').style.display = 'block';
+                    showToast(translations[currentLang].toast_unlocked, 'info');
                 } else {
-                    alert('Invalid password');
+                    showToast(translations[currentLang].toast_invalid, 'error');
                 }
             } catch (error) {
-                alert('Connection error');
+                showToast('Connection error', 'error');
+            }
+        }
+
+        async function saveSettings() {
+            const config = {
+                ping_target: document.getElementById('conf-ping_target').value,
+                ping_interval: parseInt(document.getElementById('conf-ping_interval').value),
+                speedtest_interval: parseInt(document.getElementById('conf-speedtest_interval').value),
+                influxdb_url: document.getElementById('conf-influxdb_url').value,
+                influxdb_token: document.getElementById('conf-influxdb_token').value,
+                influxdb_org: document.getElementById('conf-influxdb_org').value,
+                influxdb_bucket: document.getElementById('conf-influxdb_bucket').value,
+            };
+
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Admin-Password': adminPassword 
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                if (response.ok) {
+                    showToast(translations[currentLang].toast_save_success);
+                    hideAdmin();
+                } else {
+                    const err = await response.json();
+                    showToast(`${translations[currentLang].toast_error_save}: ${err.detail || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showToast('Connection error', 'error');
             }
         }
 
         async function triggerSpeedtest() {
             const pass = document.getElementById('admin-pass').value || adminPassword;
             if (!pass) {
-                alert('Please enter password first');
+                showToast('Please enter password first', 'error');
                 return;
             }
             try {
-                const response = await fetch(`/api/speedtest/trigger?password=${pass}`, { method: 'POST' });
+                const response = await fetch('/api/speedtest/trigger', { 
+                    method: 'POST',
+                    headers: { 'X-Admin-Password': pass }
+                });
                 const result = await response.json();
                 if (response.ok) {
-                    alert('Speedtest started! It will take about 30-60 seconds.');
+                    showToast(translations[currentLang].toast_speedtest_start, 'success');
                     hideAdmin();
                     updateStatus();
                 } else {
-                    alert(`Error: ${result.detail || result.status}`);
+                    showToast(`Error: ${result.detail || result.status}`, 'error');
                 }
             } catch (error) {
-                alert('Connection error');
+                showToast('Connection error', 'error');
             }
         }
 
         // Initial update and interval
-        initChart();
+        initCharts();
+        updateUI();
         updateStatus();
-        setInterval(updateStatus, 5000);
+        updateUptime();
+        updateEvents();
+
+        setInterval(updateStatus, 30000);
+        setInterval(updateUptime, 300000);
+        setInterval(updateEvents, 60000);
     </script>
 </body>
 

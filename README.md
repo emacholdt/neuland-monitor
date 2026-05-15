@@ -1,19 +1,22 @@
 # 🚀 Neuland Monitor
 
-A lightweight, beautiful internet connectivity and speed monitoring service for Linux servers. It logs data to **InfluxDB 2.x** and provides a premium, glassmorphism-style dashboard for real-time status updates.
-
-![Neuland Monitor Dashboard](https://raw.githubusercontent.com/your-username/neuland-monitor/main/static/screenshot.png) *(Add a screenshot here!)*
+A lightweight, high-performance internet connectivity and speed monitoring service. It logs data to **InfluxDB 2.x** and provides a premium, glassmorphism-style dashboard with real-time status and historical analytics.
 
 ## ✨ Features
 
-- **Real-time Connectivity**: Pings a target (default: 8.8.8.8) every minute.
-- **Speedtests**: Runs the official Ookla Speedtest CLI 10 times a day.
-- **Time-Series Logging**: Saves all metrics (ping, download, upload) to InfluxDB.
-- **SO-Friendly Dashboard**: A simple, beautiful web UI on port 8181 designed for family use.
-- **Admin Panel**: Password-protected section to view current configuration.
+- **Real-time Monitoring**: Pings a target (default: 8.8.8.8) at your preferred frequency.
+- **Automated Speedtests**: Runs the official Ookla Speedtest CLI on a schedule (default: 10x daily).
+- **Interactive Analytics**:
+  - **Ping History**: Real-time line chart for latency trends.
+  - **Speed History**: Historical trend for download/upload performance.
+  - **Uptime Stats**: Aggregated availability for the last 24h, 7d, 30d, and 90d.
+- **Bilingual Support**: Instant toggle between **English** and **German** (including localized date formats).
+- **Persistent Settings**: Edit monitoring intervals and database credentials directly from the UI; settings persist across container restarts.
+- **Security Hardened**: Admin API uses secure custom headers for authentication; sensitive data is protected in logs.
+- **Smart Startup**: Automatically reloads historical data from InfluxDB upon restart to keep your charts populated.
 - **Dockerized**: Deploy in seconds using Docker Compose.
 
-## 🛠️ Quick Start
+## 🛠️ Installation
 
 ### 1. Clone & Configure
 ```bash
@@ -22,8 +25,8 @@ cd neuland-monitor
 cp .env.example .env
 ```
 
-### 2. Set your Environment Variables
-Edit the `.env` file with your InfluxDB details:
+### 2. Configure Environment
+Edit the `.env` file with your credentials. Note that special characters in the password should be escaped with `$$`.
 ```ini
 INFLUXDB_URL=http://your-influxdb-ip:8086
 INFLUXDB_TOKEN=your-token
@@ -36,16 +39,16 @@ ADMIN_PASSWORD=your-secret-password
 ```bash
 docker-compose up -d --build
 ```
-
 Access your dashboard at `http://your-server-ip:8181`.
 
-## 📦 Tech Stack
+## 📦 Persistence
+The application stores its configuration in `/app/data/config.json`. Ensure the `./data` volume is mapped in your `docker-compose.yml` to keep your settings after container updates.
 
+## 🛠️ Tech Stack
 - **Backend**: FastAPI (Python 3.11)
 - **Database**: InfluxDB 2.x
-- **Frontend**: Vanilla JS, CSS (Glassmorphism)
-- **Monitoring**: Ookla Speedtest CLI
+- **Frontend**: Vanilla JS, CSS (Glassmorphism), Chart.js
+- **Tooling**: Ookla Speedtest CLI
 
 ## 📄 License
-
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
