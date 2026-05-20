@@ -1290,7 +1290,7 @@
             }
             const token = adminPassword || document.getElementById('admin-pass').value;
             const lang = currentLang || 'en';
-            window.open(`/static/report.html?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&token=${encodeURIComponent(token)}&lang=${lang}`, '_blank');
+            window.open(`static/report.html?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&token=${encodeURIComponent(token)}&lang=${lang}`, '_blank');
         }
 
         // Initial update and interval
