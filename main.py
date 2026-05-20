@@ -353,32 +353,76 @@ async def get_uptime():
     return uptimes
 
 @app.get("/api/events")
-async def get_events(page: int = 1, limit: int = 10):
-    # This queries for downtime events (online == 0)
-    # We look for transitions or just segments of downtime
-    # For simplicity, we'll fetch raw 0s and group them if possible, 
-    # but Flux is better at this.
+async def get_events(page: int = 1, limit: int = 10, sort_by: str = "start", sort_order: str = "desc"):
     try:
-        # Simplified: fetch last X downtime points
+        # Fetch offline check points (online == 0) from InfluxDB for the last 30 days
         query = f'''
             from(bucket: "{settings.influxdb_bucket}")
             |> range(start: -30d)
             |> filter(fn: (r) => r._measurement == "connectivity" and r._field == "online" and r._value == 0)
-            |> sort(columns: ["_time"], desc: true)
-            |> limit(n: {limit}, offset: {(page-1)*limit})
+            |> sort(columns: ["_time"], desc: false)
         '''
         result = influx_client.query_api().query(query=query, org=settings.influxdb_org)
-        events = []
+        raw_times = []
         for table in result:
             for record in table.records:
-                events.append({
-                    "timestamp": record.get_time().isoformat(),
-                    "status": "Offline"
-                })
-        return events
+                raw_times.append(record.get_time())
+        
+        # Sort chronologically to group them
+        raw_times.sort()
+        
+        # Group into continuous phases
+        phases = []
+        current_phase = []
+        for t in raw_times:
+            if not current_phase:
+                current_phase.append(t)
+            else:
+                gap = (t - current_phase[-1]).total_seconds()
+                # Group consecutive failures if they occur within threshold (2.5x ping_interval, min 150s)
+                threshold = max(settings.ping_interval * 2.5, 150.0)
+                if gap <= threshold:
+                    current_phase.append(t)
+                else:
+                    phases.append(current_phase)
+                    current_phase = [t]
+        if current_phase:
+            phases.append(current_phase)
+            
+        # Format phases and calculate duration in seconds
+        formatted_phases = []
+        for phase in phases:
+            start_t = phase[0]
+            end_t = phase[-1]
+            duration = (end_t - start_t).total_seconds()
+            formatted_phases.append({
+                "start": start_t.isoformat(),
+                "end": end_t.isoformat(),
+                "duration": duration,
+                "checks": len(phase)
+            })
+            
+        # Sort phases
+        reverse = (sort_order == "desc")
+        if sort_by in ("start", "end", "duration", "checks"):
+            formatted_phases.sort(key=lambda x: x[sort_by], reverse=reverse)
+        else:
+            formatted_phases.sort(key=lambda x: x["start"], reverse=True)
+            
+        total_phases = len(formatted_phases)
+        start_idx = (page - 1) * limit
+        end_idx = start_idx + limit
+        paginated_phases = formatted_phases[start_idx:end_idx]
+        
+        return {
+            "events": paginated_phases,
+            "total": total_phases,
+            "page": page,
+            "limit": limit
+        }
     except Exception as e:
         logger.error(f"Events query failed: {e}")
-        return []
+        return {"events": [], "total": 0, "page": page, "limit": limit}
 
 @app.get("/api/config")
 async def get_config(request: Request):

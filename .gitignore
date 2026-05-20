@@ -12,6 +12,11 @@ __pycache__/
 *.so
 .Python
 env/
+venv/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
 build/
 develop-eggs/
 dist/

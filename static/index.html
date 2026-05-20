@@ -435,6 +435,17 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        .events-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .events-table th.sortable:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
         .events-table td {
             padding: 12px 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -550,12 +561,22 @@
             </div>
 
             <div class="events-table-container">
-                <span class="stat-label" data-i18n="recent_events">Recent Events</span>
+                <span class="stat-label" data-i18n="recent_events">Downtime History</span>
                 <table class="events-table">
                     <thead>
                         <tr>
-                            <th data-i18n="time">Time</th>
-                            <th data-i18n="event">Event</th>
+                            <th onclick="handleSort('start')" class="sortable">
+                                <span data-i18n="start_time">Start</span><span id="sort-icon-start"> ▼</span>
+                            </th>
+                            <th onclick="handleSort('end')" class="sortable">
+                                <span data-i18n="end_time">End</span><span id="sort-icon-end"></span>
+                            </th>
+                            <th onclick="handleSort('duration')" class="sortable">
+                                <span data-i18n="duration">Duration</span><span id="sort-icon-duration"></span>
+                            </th>
+                            <th onclick="handleSort('checks')" class="sortable" style="text-align: right;">
+                                <span data-i18n="checks">Checks</span><span id="sort-icon-checks"></span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody id="events-body">
@@ -653,9 +674,11 @@
                 upload: 'Upload',
                 ping: 'Ping',
                 last_speedtest: 'Last Speedtest',
-                recent_events: 'Recent Events',
-                time: 'Time',
-                event: 'Event',
+                recent_events: 'Downtime History (Last 30 Days)',
+                start_time: 'Start',
+                end_time: 'End',
+                duration: 'Duration',
+                checks: 'Checks',
                 admin_settings: 'Admin Settings',
                 admin_password: 'Admin Password',
                 unlock_settings: 'Unlock Settings',
@@ -693,9 +716,11 @@
                 upload: 'Upload',
                 ping: 'Ping',
                 last_speedtest: 'Letzter Speedtest',
-                recent_events: 'Letzte Ereignisse',
-                time: 'Zeit',
-                event: 'Ereignis',
+                recent_events: 'Offline-Phasen (Letzte 30 Tage)',
+                start_time: 'Anfang',
+                end_time: 'Ende',
+                duration: 'Dauer',
+                checks: 'Messungen',
                 admin_settings: 'Admin-Einstellungen',
                 admin_password: 'Admin-Passwort',
                 unlock_settings: 'Einstellungen freischalten',
@@ -734,9 +759,11 @@
                 upload: 'Hochloodn',
                 ping: 'Pling',
                 last_speedtest: 'Letzter Speed-Gugg',
-                recent_events: 'Was war\'n los?',
-                time: 'Uhrzeid',
-                event: 'Ereichnis',
+                recent_events: 'Offline-Zeidn (Letzte 30 Tage)',
+                start_time: 'Anfang',
+                end_time: 'Ende',
+                duration: 'Wie lang',
+                checks: 'Prüfunchn',
                 admin_settings: 'Chef-Gedöns',
                 admin_password: 'Häuptlings-Passwort',
                 unlock_settings: 'Alles uffmachn',
@@ -1030,33 +1057,88 @@
         }
 
         let currentPage = 1;
+        let currentSortBy = 'start';
+        let currentSortOrder = 'desc';
+
         async function updateEvents() {
             try {
-                const response = await fetch(`api/events?page=${currentPage}&limit=5`);
+                const response = await fetch(`api/events?page=${currentPage}&limit=5&sort_by=${currentSortBy}&sort_order=${currentSortOrder}`);
                 const data = await response.json();
 
                 const body = document.getElementById('events-body');
                 body.innerHTML = '';
 
-                if (data.length === 0) {
-                    body.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-secondary);">${translations[currentLang].no_events}</td></tr>`;
+                const events = data.events || [];
+                const total = data.total || 0;
+
+                if (events.length === 0) {
+                    body.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">${translations[currentLang].no_events}</td></tr>`;
                 } else {
-                    data.forEach(event => {
+                    events.forEach(event => {
                         const tr = document.createElement('tr');
-                        const timeStr = new Date(event.timestamp).toLocaleString(getLocale(), {
+                        const startStr = new Date(event.start).toLocaleString(getLocale(), {
+                            day: '2-digit', month: '2-digit', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit', hour12: false
+                        });
+                        const endStr = new Date(event.end).toLocaleString(getLocale(), {
                             day: '2-digit', month: '2-digit', year: 'numeric',
                             hour: '2-digit', minute: '2-digit', hour12: false
                         });
                         tr.innerHTML = `
-                            <td>${timeStr}</td>
-                            <td style="color: var(--accent-red); font-weight: 600;">${translations[currentLang].offline}</td>
+                            <td>${startStr}</td>
+                            <td>${endStr}</td>
+                            <td>${formatDuration(event.duration)}</td>
+                            <td style="text-align: right; color: var(--accent-red); font-weight: 600;">${event.checks}</td>
                         `;
                         body.appendChild(tr);
                     });
                 }
+
+                // Update pagination buttons state
+                document.getElementById('btn-prev').disabled = currentPage === 1;
+                document.getElementById('btn-next').disabled = currentPage * 5 >= total;
+
+                // Update sorting icons
+                const fields = ['start', 'end', 'duration', 'checks'];
+                fields.forEach(f => {
+                    const icon = document.getElementById(`sort-icon-${f}`);
+                    if (icon) {
+                        if (f === currentSortBy) {
+                            icon.innerText = currentSortOrder === 'asc' ? ' ▲' : ' ▼';
+                        } else {
+                            icon.innerText = '';
+                        }
+                    }
+                });
             } catch (error) {
                 console.error('Failed to fetch events:', error);
             }
+        }
+
+        function formatDuration(seconds) {
+            if (seconds === 0) {
+                return '< 1m';
+            }
+            if (seconds < 60) {
+                return `${Math.round(seconds)}s`;
+            }
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.round(seconds % 60);
+            if (remainingSeconds === 0) {
+                return `${minutes}m`;
+            }
+            return `${minutes}m ${remainingSeconds}s`;
+        }
+
+        function handleSort(field) {
+            if (currentSortBy === field) {
+                currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortBy = field;
+                currentSortOrder = 'desc';
+            }
+            currentPage = 1;
+            updateEvents();
         }
 
         function changePage(delta) {
