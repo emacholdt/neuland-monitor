@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="static/logo.svg" alt="Neuland Monitor Logo" width="120" />
+  <img src="https://raw.githubusercontent.com/emacholdt/neuland-monitor/main/static/logo.svg" alt="Neuland Monitor Logo" width="120" />
 </p>
 
 <h1 align="center">Neuland Monitor</h1>
