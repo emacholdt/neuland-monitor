@@ -19,6 +19,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 CONFIG_PATH = "data/config.json"
+VERSION = os.environ.get("APP_VERSION", "dev")
 
 class Settings(BaseSettings):
     influxdb_url: str = "http://localhost:8086"
@@ -423,6 +424,107 @@ async def get_events(page: int = 1, limit: int = 10, sort_by: str = "start", sor
     except Exception as e:
         logger.error(f"Events query failed: {e}")
         return {"events": [], "total": 0, "page": page, "limit": limit}
+
+@app.get("/api/admin/report-data")
+async def get_report_data(request: Request, start: str, end: str):
+    password = request.headers.get("X-Admin-Password")
+    if password != settings.admin_password:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    try:
+        from datetime import datetime
+        try:
+            start_dt = datetime.fromisoformat(start)
+            end_dt = datetime.fromisoformat(end)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=f"Invalid date format: {e}")
+            
+        start_iso = start_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+        end_iso = end_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+        
+        # 1. Fetch Availability % (mean of online)
+        mean_query = f'''
+            from(bucket: "{settings.influxdb_bucket}")
+            |> range(start: {start_iso}, stop: {end_iso})
+            |> filter(fn: (r) => r._measurement == "connectivity" and r._field == "online")
+            |> mean()
+        '''
+        mean_result = influx_client.query_api().query(query=mean_query, org=settings.influxdb_org)
+        availability = 100.0
+        if mean_result and len(mean_result) > 0 and len(mean_result[0].records) > 0:
+            val = mean_result[0].records[0].get_value()
+            if val is not None:
+                availability = round(val * 100, 3)
+                
+        # 2. Fetch offline points (online == 0) for detailed incidents
+        offline_query = f'''
+            from(bucket: "{settings.influxdb_bucket}")
+            |> range(start: {start_iso}, stop: {end_iso})
+            |> filter(fn: (r) => r._measurement == "connectivity" and r._field == "online" and r._value == 0)
+            |> sort(columns: ["_time"], desc: false)
+        '''
+        offline_result = influx_client.query_api().query(query=offline_query, org=settings.influxdb_org)
+        
+        raw_times = []
+        for table in offline_result:
+            for record in table.records:
+                raw_times.append(record.get_time())
+                
+        raw_times.sort()
+        
+        # Group into continuous phases
+        phases = []
+        current_phase = []
+        for t in raw_times:
+            if not current_phase:
+                current_phase.append(t)
+            else:
+                gap = (t - current_phase[-1]).total_seconds()
+                threshold = max(settings.ping_interval * 2.5, 150.0)
+                if gap <= threshold:
+                    current_phase.append(t)
+                else:
+                    phases.append(current_phase)
+                    current_phase = [t]
+        if current_phase:
+            phases.append(current_phase)
+            
+        formatted_phases = []
+        total_downtime_seconds = 0.0
+        longest_downtime_seconds = 0.0
+        
+        for phase in phases:
+            start_t = phase[0]
+            end_t = phase[-1]
+            duration = (end_t - start_t).total_seconds()
+            effective_duration = max(duration, float(settings.ping_interval))
+            total_downtime_seconds += effective_duration
+            if effective_duration > longest_downtime_seconds:
+                longest_downtime_seconds = effective_duration
+                
+            formatted_phases.append({
+                "start": start_t.isoformat(),
+                "end": end_t.isoformat(),
+                "duration": effective_duration,
+                "checks": len(phase)
+            })
+            
+        formatted_phases.sort(key=lambda x: x["start"], reverse=False)
+        
+        return {
+            "start": start_iso,
+            "end": end_iso,
+            "availability": availability,
+            "total_downtime_seconds": total_downtime_seconds,
+            "longest_downtime_seconds": longest_downtime_seconds,
+            "incidents_count": len(formatted_phases),
+            "events": formatted_phases,
+            "version": VERSION
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Report data query failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/config")
 async def get_config(request: Request):

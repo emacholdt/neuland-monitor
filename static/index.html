@@ -646,6 +646,20 @@
                 <button onclick="triggerSpeedtest()" id="btn-speedtest"
                     style="background: var(--accent-green); margin-top: 10px;" data-i18n="run_speedtest">Run Speedtest
                     Now</button>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1);" />
+                <h3 style="margin-bottom: 15px;" data-i18n="downtime_report_title">Downtime Report</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label data-i18n="report_start">Start Date</label>
+                        <input type="datetime-local" id="report-start">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="report_end">End Date</label>
+                        <input type="datetime-local" id="report-end">
+                    </div>
+                </div>
+                <button onclick="generateReport()" style="background: var(--accent-blue); margin-top: 10px;" data-i18n="generate_report">Generate Report</button>
             </div>
 
             <button onclick="hideAdmin()"
@@ -702,7 +716,11 @@
                 toast_error_save: 'Error saving settings',
                 toast_save_success: 'Settings saved successfully!',
                 toast_speedtest_start: 'Speedtest started! This will take about 60s.',
-                no_events: 'No downtime events recorded.'
+                no_events: 'No downtime events recorded.',
+                downtime_report_title: 'Downtime Report',
+                report_start: 'Start Date & Time',
+                report_end: 'End Date & Time',
+                generate_report: 'Generate Report'
             },
             de: {
                 checking: 'Prüfen...',
@@ -744,7 +762,11 @@
                 toast_error_save: 'Fehler beim Speichern',
                 toast_save_success: 'Einstellungen erfolgreich gespeichert!',
                 toast_speedtest_start: 'Speedtest gestartet! Das dauert etwa 60 Sek.',
-                no_events: 'Keine Ausfälle aufgezeichnet.'
+                no_events: 'Keine Ausfälle aufgezeichnet.',
+                downtime_report_title: 'Ausfall-Bericht',
+                report_start: 'Anfangs-Datum & Zeit',
+                report_end: 'End-Datum & Zeit',
+                generate_report: 'Bericht erstellen'
             },
             sx: {
                 // Alles uff sächsisch!
@@ -787,7 +809,11 @@
                 toast_error_save: 'Ging nich zu speichere',
                 toast_save_success: 'Alles gebongt!',
                 toast_speedtest_start: 'Speedtest läuft nu! Wart ma 60 Sek.',
-                no_events: "Nüscht passiert hier."
+                no_events: "Nüscht passiert hier.",
+                downtime_report_title: 'Ausfall-Zeddel',
+                report_start: 'Anfangs-Datum unn Uhrzeit',
+                report_end: 'End-Datum unn Uhrzeit',
+                generate_report: 'Zeddel druckn'
             }
         };
 
@@ -1174,6 +1200,14 @@
                     document.getElementById('conf-influxdb_org').value = config.influxdb_org || '';
                     document.getElementById('conf-influxdb_bucket').value = config.influxdb_bucket;
 
+                    // Prepopulate default report dates (last 7 days)
+                    const now = new Date();
+                    const sevenDaysAgo = new Date();
+                    sevenDaysAgo.setDate(now.getDate() - 7);
+                    
+                    document.getElementById('report-start').value = formatDateTimeLocal(sevenDaysAgo);
+                    document.getElementById('report-end').value = formatDateTimeLocal(now);
+
                     document.getElementById('login-view').style.display = 'none';
                     document.getElementById('settings-view').style.display = 'block';
                     showToast(translations[currentLang].toast_unlocked, 'info');
@@ -1240,6 +1274,23 @@
             } catch (error) {
                 showToast('Connection error', 'error');
             }
+        }
+
+        function formatDateTimeLocal(date) {
+            const tzoffset = date.getTimezoneOffset() * 60000;
+            return (new Date(date - tzoffset)).toISOString().slice(0, 16);
+        }
+
+        function generateReport() {
+            const start = document.getElementById('report-start').value;
+            const end = document.getElementById('report-end').value;
+            if (!start || !end) {
+                showToast('Please select both start and end dates', 'error');
+                return;
+            }
+            const token = adminPassword || document.getElementById('admin-pass').value;
+            const lang = currentLang || 'en';
+            window.open(`/static/report.html?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&token=${encodeURIComponent(token)}&lang=${lang}`, '_blank');
         }
 
         // Initial update and interval

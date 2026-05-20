@@ -16,6 +16,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Version injected at build time by CI from git tag, defaults to dev
+ARG VERSION=dev
+ENV APP_VERSION=${VERSION}
+
 # Copy application code
 COPY . .
 

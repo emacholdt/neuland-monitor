@@ -33,6 +33,7 @@
   - **Uptime Stats**: Aggregated availability for the last 24h, 7d, 30d, and 90d.
   - **Downtime History**: Grouped list of continuous offline phases (last 30 days) with start, end, duration, and check counts with interactive click-to-sort headers.
 - **Multilingual Support**: Instant toggle between **English**, **German**, and **Saxon** dialect (including localized date formats).
+- **Downtime Reports**: Generate printable, localized reports for any date range — with availability stats, incident details, CSV export, and browser-native PDF printing.
 - **Persistent Settings**: Edit monitoring intervals and database credentials directly from the UI; settings persist across container restarts.
 - **Security Hardened**: Admin API uses secure custom headers for authentication; sensitive data is protected in logs.
 - **Smart Startup**: Automatically reloads historical data from InfluxDB upon restart to keep your charts populated.
