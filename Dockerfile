@@ -1,12 +1,15 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# Install dependencies for speedtest and ping
-RUN apt-get update && apt-get install -y \
+# Install dependencies for speedtest and ping, then clean up build-only packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gnupg \
+    ca-certificates \
     iputils-ping \
     && curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash \
-    && apt-get install -y speedtest \
+    && apt-get install -y --no-install-recommends speedtest \
+    && apt-get purge -y curl gnupg \
+    && apt-get autoremove -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -14,7 +17,8 @@ WORKDIR /app
 
 # Copy requirements and install python packages
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Version injected at build time by CI from git tag, defaults to dev
 ARG VERSION=dev

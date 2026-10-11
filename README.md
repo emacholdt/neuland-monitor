@@ -43,7 +43,7 @@
 
 ### 1. Clone & Configure
 ```bash
-git clone https://github.com/your-username/neuland-monitor.git
+git clone https://github.com/emacholdt/neuland-monitor.git
 cd neuland-monitor
 cp .env.example .env
 ```
@@ -60,7 +60,7 @@ ADMIN_PASSWORD=your-secret-password
 
 ### 3. Build & Run
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 Access your dashboard at `http://your-server-ip:8181`.
 
@@ -74,7 +74,7 @@ uv run --with-requirements requirements.txt uvicorn main:app --port 8182
 The application stores its configuration in `/app/data/config.json`. Ensure the `./data` volume is mapped in your `docker-compose.yml` to keep your settings after container updates.
 
 ## 🛠️ Tech Stack
-- **Backend**: FastAPI (Python 3.11)
+- **Backend**: FastAPI (Python 3.12)
 - **Database**: InfluxDB 2.x
 - **Frontend**: Vanilla JS, CSS (Glassmorphism), Chart.js
 - **Tooling**: Ookla Speedtest CLI

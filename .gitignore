@@ -36,7 +36,6 @@ share/python-wheels/
 MANIFEST
 
 # Docker
-.dockerignore
 
 # IDEs
 .vscode/
